@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SignUpActivity">
+
+    <ImageView
+        android:id="@+id/imageView_icon_sign_up"
+        android:layout_width="164dp"
+        android:layout_height="164dp"
+        android:src="@drawable/icon_messenger"
+        android:layout_gravity="center"
+        android:layout_marginTop="72dp"/>
+
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:id="@+id/progressBar_sign_up"
+            android:visibility="invisible"
+            />
+
+    <EditText
+        android:id="@+id/editText_name_sign_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Name"
+        android:inputType="text"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        />
+
+    <EditText
+        android:id="@+id/editText_email_sign_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Phone Number or Email"
+        android:inputType="textEmailAddress"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        />
+
+    <EditText
+        android:id="@+id/editText_password_sign_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        />
+
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="Sign Up"
+        android:enabled="false"
+        android:background="@drawable/btn_background"
+        android:textSize="14sp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/status_text_color"/>
+
+
+
+
+</LinearLayout>
