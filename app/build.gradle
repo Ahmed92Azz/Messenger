@@ -48,6 +48,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:16.1.0'
     implementation 'com.google.firebase:firebase-storage:15.0.0'
     implementation 'com.google.firebase:firebase-firestore:17.1.5'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+
     implementation 'com.firebaseui:firebase-ui-storage:3.2.2'
 
     //glide

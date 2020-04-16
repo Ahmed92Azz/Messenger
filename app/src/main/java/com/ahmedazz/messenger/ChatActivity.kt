@@ -15,6 +15,7 @@ import com.ahmedazz.messenger.model.ImageMessage
 import com.ahmedazz.messenger.model.Message
 import com.ahmedazz.messenger.model.MessageType
 import com.ahmedazz.messenger.model.TextMessage
+import com.ahmedazz.messenger.recyclerview.RecipientImageMessageItem
 import com.ahmedazz.messenger.recyclerview.RecipientTextMessageItem
 import com.ahmedazz.messenger.recyclerview.SenderImageMessageItem
 import com.ahmedazz.messenger.recyclerview.SenderTextMessageItem
@@ -30,6 +31,7 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
+
 
     private lateinit var mCurrentChatChannelId: String
     private val storageInstance: FirebaseStorage by lazy {
@@ -182,7 +184,11 @@ class ChatActivity : AppCompatActivity() {
                 } else {
 
                     val imageMessage = document.toObject(ImageMessage::class.java)
-                    messageAdapter.add(SenderImageMessageItem(document.toObject(ImageMessage::class.java)!!, document.id, this@ChatActivity))
+                    if (imageMessage?.senderId == mCurrentUserId){
+                        messageAdapter.add(SenderImageMessageItem(document.toObject(ImageMessage::class.java)!!, document.id, this@ChatActivity))
+                    } else {
+                        messageAdapter.add(RecipientImageMessageItem(document.toObject(ImageMessage::class.java)!!, document.id, this@ChatActivity))
+                    }
                 }
             }
 

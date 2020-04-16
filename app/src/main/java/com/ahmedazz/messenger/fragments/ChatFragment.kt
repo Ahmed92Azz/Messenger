@@ -16,6 +16,7 @@ import com.ahmedazz.messenger.ProfileActivity
 import com.ahmedazz.messenger.R
 import com.ahmedazz.messenger.model.User
 import com.ahmedazz.messenger.recyclerview.ChatItem
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.xwray.groupie.GroupAdapter
@@ -48,6 +49,7 @@ class ChatFragment : Fragment() {
 
         circleImageViewProfileImage.setOnClickListener {
             startActivity(Intent(activity, ProfileActivity::class.java))
+            activity!!.finish()
         }
 
         // Listening of chats.....
@@ -58,7 +60,10 @@ class ChatFragment : Fragment() {
 
     private fun addChatListener(onListen: (List<Item>) -> Unit): ListenerRegistration {
 
-        return firestoreInstance.collection("users").addSnapshotListener { querySnapshot, firebaseFirestoreException ->
+        return firestoreInstance.collection("users")
+            .document(FirebaseAuth.getInstance().currentUser!!.uid)
+            .collection("sharedChat")
+            .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
             if (firebaseFirestoreException != null) {
                 return@addSnapshotListener
@@ -66,12 +71,13 @@ class ChatFragment : Fragment() {
 
             val items = mutableListOf<Item>()
 
-
             querySnapshot!!.documents.forEach {document ->
 
-                items.add(ChatItem(document.id,document.toObject(User::class.java)!!, activity!!))
-            }
+                if (document.exists()){
+                    items.add(ChatItem(document.id,document.toObject(User::class.java)!!, activity!!))
+                }
 
+            }
             onListen(items)
         }
     }
@@ -88,7 +94,7 @@ class ChatFragment : Fragment() {
         }
     }
 
-    val onItemClick = OnItemClickListener { item, view ->
+    private val onItemClick = OnItemClickListener { item, view ->
 
         if (item is ChatItem){
 
