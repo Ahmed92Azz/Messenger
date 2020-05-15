@@ -8,18 +8,17 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.ahmedazz.messenger.glide.GlideApp
-import com.ahmedazz.messenger.model.ImageMessage
-import com.ahmedazz.messenger.model.Message
-import com.ahmedazz.messenger.model.MessageType
-import com.ahmedazz.messenger.model.TextMessage
+import com.ahmedazz.messenger.model.*
 import com.ahmedazz.messenger.recyclerview.RecipientImageMessageItem
 import com.ahmedazz.messenger.recyclerview.RecipientTextMessageItem
 import com.ahmedazz.messenger.recyclerview.SenderImageMessageItem
 import com.ahmedazz.messenger.recyclerview.SenderTextMessageItem
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
@@ -45,10 +44,18 @@ class ChatActivity : AppCompatActivity() {
         FirebaseFirestore.getInstance()
     }
 
+    private lateinit var mRecipientId: String
+
+    private val currentUserDocRef: DocumentReference
+        get() = firestoreInstance.document(
+            "users/${FirebaseAuth.getInstance().currentUser?.uid}"
+        )
+
+
     private val chatChannelsCollectionRef = firestoreInstance.collection("chatChannels")
 
     //Vars
-    private var mRecipientId = ""
+    private lateinit var currentUser: User
     private var mCurrentUserId = FirebaseAuth.getInstance().currentUser!!.uid
     private val messageAdapter by lazy { GroupAdapter<ViewHolder>() }
 
@@ -57,11 +64,17 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+
+        getUserInfo {user ->
+            currentUser = user
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         } else {
             window.statusBarColor = Color.WHITE
         }
+
 
         val userName = intent.getStringExtra("user_name")
         val profileImage = intent.getStringExtra("profile_image")
@@ -96,6 +109,8 @@ class ChatActivity : AppCompatActivity() {
                             editText_message.text.toString(),
                             mCurrentUserId,
                             mRecipientId,
+                            currentUser.name,
+                            "",
                             Calendar.getInstance().time
                         )
                     sentMessage(channelId, messageSend)
@@ -210,7 +225,7 @@ class ChatActivity : AppCompatActivity() {
             val selectedImageBytes = outputStream.toByteArray()
 
             uploadImage(selectedImageBytes) { path->
-                val imageMessage = ImageMessage(path, mCurrentUserId, mRecipientId ,  Calendar.getInstance().time)
+                val imageMessage = ImageMessage(path, mCurrentUserId, mRecipientId,currentUser.name, "",  Calendar.getInstance().time)
 
 
                 //chatChannelsCollectionRef.document(mCurrentChatChannelId).collection("messages").add(imageMessage)
@@ -236,5 +251,12 @@ class ChatActivity : AppCompatActivity() {
             }
 
     }
+
+    private fun getUserInfo(onComplete:(User) -> Unit){
+        currentUserDocRef.get().addOnSuccessListener {
+            onComplete(it.toObject(User::class.java)!!)
+        }
+    }
+
 
 }

@@ -3,18 +3,25 @@ package com.ahmedazz.messenger
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat.startActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_sign_in.*
 
 class SignInActivity : AppCompatActivity(), TextWatcher{
 
     private val mAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
+    }
+
+    private val firestore: FirebaseFirestore by lazy {
+        FirebaseFirestore.getInstance()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +81,14 @@ class SignInActivity : AppCompatActivity(), TextWatcher{
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {task ->
 
             if (task.isSuccessful){
+
+                FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {tastTwo ->
+
+                    val token = tastTwo.result?.token
+                    firestore.collection("users")
+                        .document(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .update(mapOf("token" to token))
+                }
                 progress_sign_in.visibility = View.INVISIBLE
                 val intentMainActivity = Intent(this@SignInActivity, MainActivity::class.java)
                 intentMainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

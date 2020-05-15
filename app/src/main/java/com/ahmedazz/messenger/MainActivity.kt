@@ -16,7 +16,6 @@ import com.ahmedazz.messenger.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +45,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 if (user!!.profileImage.isNotEmpty()){
                     GlideApp.with(this@MainActivity)
                         .load(storageInstance.getReference(user.profileImage))
+                        .placeholder(R.drawable.ic_account_circle)
                         .into(circleImageView_profile_image)
                 } else {
                     circleImageView_profile_image.setImageResource(R.drawable.ic_account_circle)
