@@ -31,7 +31,6 @@ import java.util.*
 
 class ChatActivity : AppCompatActivity() {
 
-
     private lateinit var mCurrentChatChannelId: String
     private val storageInstance: FirebaseStorage by lazy {
         FirebaseStorage.getInstance()
@@ -113,7 +112,7 @@ class ChatActivity : AppCompatActivity() {
                             "",
                             Calendar.getInstance().time
                         )
-                    sentMessage(channelId, messageSend)
+                    sentMessage(channelId, messageSend, editText_message.text.toString())
                     editText_message.setText("")
                 } else {
                     Toast.makeText(this, "Empty", Toast.LENGTH_LONG).show()
@@ -139,8 +138,30 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun sentMessage(channelId: String, message: Message) {
+    private fun sentMessage(channelId: String, message: Message, text: String) {
+
+        val contentMessage = mutableMapOf<String, Any>()
+        contentMessage["text"] = text
+        contentMessage["senderId"] = message.senderId
+        contentMessage["recipientId"] = message.recipientId
+        contentMessage["senderName"] = message.senderName
+        contentMessage["recipientName"] = message.recipientName
+        contentMessage["date"] = message.date
+        contentMessage["type"] = message.type
+
         chatChannelsCollectionRef.document(channelId).collection("messages").add(message)
+
+        firestoreInstance.collection("users")
+            .document(FirebaseAuth.getInstance().currentUser!!.uid)
+            .collection("sharedChat")
+            .document(mRecipientId)
+            .update(contentMessage)
+
+        firestoreInstance.collection("users")
+            .document(mRecipientId)
+            .collection("sharedChat")
+            .document(FirebaseAuth.getInstance().currentUser!!.uid)
+            .update(contentMessage)
     }
 
     private fun createChatChannel(onComplete: (channelId: String) -> Unit) {
@@ -158,6 +179,7 @@ class ChatActivity : AppCompatActivity() {
 
 
                 val newChatChannel = firestoreInstance.collection("users").document()
+
 
                 firestoreInstance.collection("users")
                     .document(mRecipientId)
@@ -231,7 +253,7 @@ class ChatActivity : AppCompatActivity() {
                 //chatChannelsCollectionRef.document(mCurrentChatChannelId).collection("messages").add(imageMessage)
 
 
-                sentMessage(mCurrentChatChannelId, imageMessage)
+                sentMessage(mCurrentChatChannelId, imageMessage, "PHOTO")
             }
         }
 

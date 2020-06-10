@@ -3,19 +3,23 @@ package com.ahmedazz.messenger.recyclerview
 import android.content.Context
 import com.ahmedazz.messenger.R
 import com.ahmedazz.messenger.glide.GlideApp
+import com.ahmedazz.messenger.model.TextMessage
 import com.ahmedazz.messenger.model.User
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.model.Document
 import com.google.firebase.storage.FirebaseStorage
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.recycler_view_item.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 
 class ChatItem(
     val uid: String,
     val user: User,
+    val textMessage: TextMessage,
     val context: Context
 ) : Item() {
 
@@ -33,8 +37,12 @@ class ChatItem(
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
 
-        viewHolder.item_tiem_textView.text = "Time"
-        viewHolder.item_last_message_textView.text = "last message..."
+        val format = SimpleDateFormat("hh: mm: a")
+        val time = format.format(Date(textMessage.date.time))
+
+
+        viewHolder.item_tiem_textView.text = time
+        viewHolder.item_last_message_textView.text = textMessage.text
 
         getCurrentUser{user ->
             viewHolder.item_name_textView.text = user.name

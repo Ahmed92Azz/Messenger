@@ -14,17 +14,21 @@ import com.ahmedazz.messenger.ChatActivity
 import com.ahmedazz.messenger.ProfileActivity
 
 import com.ahmedazz.messenger.R
+import com.ahmedazz.messenger.SearchActivity
+import com.ahmedazz.messenger.model.TextMessage
 import com.ahmedazz.messenger.model.User
 import com.ahmedazz.messenger.recyclerview.ChatItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.OnItemClickListener
 import com.xwray.groupie.Section
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
 import kotlinx.android.synthetic.main.fragment_chat.*
+import kotlinx.android.synthetic.main.fragment_chat.view.*
 
 
 class ChatFragment : Fragment() {
@@ -42,6 +46,13 @@ class ChatFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
 
+        val view = inflater.inflate(R.layout.fragment_chat, container, false)
+
+        view.search_image_view.setOnClickListener {
+
+            activity!!.startActivity(Intent(activity, SearchActivity::class.java))
+        }
+
         val textViewTitle = activity?.findViewById(R.id.title_toolbar_textView) as TextView
         textViewTitle.text = "Chats"
 
@@ -55,7 +66,7 @@ class ChatFragment : Fragment() {
         // Listening of chats.....
         addChatListener(::initRecyclerView)
 
-        return inflater.inflate(R.layout.fragment_chat, container, false)
+        return view
     }
 
     private fun addChatListener(onListen: (List<Item>) -> Unit): ListenerRegistration {
@@ -63,6 +74,7 @@ class ChatFragment : Fragment() {
         return firestoreInstance.collection("users")
             .document(FirebaseAuth.getInstance().currentUser!!.uid)
             .collection("sharedChat")
+            .orderBy("date", Query.Direction.DESCENDING)
             .addSnapshotListener { querySnapshot, firebaseFirestoreException ->
 
             if (firebaseFirestoreException != null) {
@@ -74,7 +86,7 @@ class ChatFragment : Fragment() {
             querySnapshot!!.documents.forEach {document ->
 
                 if (document.exists()){
-                    items.add(ChatItem(document.id,document.toObject(User::class.java)!!, activity!!))
+                    items.add(ChatItem(document.id,document.toObject(User::class.java)!!, document.toObject(TextMessage::class.java)!!, activity!!))
                 }
 
             }

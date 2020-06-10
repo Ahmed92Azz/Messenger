@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.util.Log
+import com.ahmedazz.messenger.ChatActivity
 import com.ahmedazz.messenger.MainActivity
 import com.ahmedazz.messenger.R
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -40,8 +41,6 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.chat_channel_name)
             val descriptionText = getString(R.string.chat_channel_descriptionText)
@@ -52,7 +51,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        val intent = Intent(this, MainActivity::class.java).apply {
+        val intent = Intent(this, MainActivity::class.java).apply{
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 

@@ -31,12 +31,13 @@
 
 
     <ImageView
+            android:id="@+id/search_image_view"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_search"
-            app:layout_constraintStart_toStartOf="@+id/editText"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
+            android:src="@drawable/ic_search"
+            app:layout_constraintStart_toStartOf="@+id/editText"
             app:layout_constraintTop_toTopOf="@+id/editText"
             />
 
