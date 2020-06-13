@@ -17,16 +17,7 @@
             >
         <activity
                 android:name=".SearchActivity"
-                android:launchMode="singleTop"
-                >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
-            <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable"
-                    />
+                android:launchMode="singleTop">
         </activity>
         <activity android:name=".ChatActivity"></activity>
         <activity android:name=".ProfileActivity"></activity>

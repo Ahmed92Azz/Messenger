@@ -2,16 +2,20 @@ package com.ahmedazz.messenger
 
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.support.v7.widget.SearchView
+import android.view.MenuItem
 import com.ahmedazz.messenger.model.User
+import com.ahmedazz.messenger.recyclerview.ChatItem
 import com.ahmedazz.messenger.recyclerview.SearchItem
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.OnItemClickListener
 import com.xwray.groupie.Section
 import com.xwray.groupie.kotlinandroidextensions.Item
 import com.xwray.groupie.kotlinandroidextensions.ViewHolder
@@ -19,24 +23,32 @@ import kotlinx.android.synthetic.main.activity_search.*
 
 class SearchActivity : AppCompatActivity() {
 
-    //
-    val firestoreInstance by lazy {
+    val db: FirebaseFirestore by lazy {
         FirebaseFirestore.getInstance()
     }
 
-    private var shouldInitRecyclerView = true
     private lateinit var searchSection: Section
+    private var shouldInitRecyclerView = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-
-
-
         setSupportActionBar(toolbar_search)
-
         supportActionBar?.title = ""
+
+        supportActionBar?.setHomeButtonEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        when(item?.itemId){
+            android.R.id.home -> {
+                finish()
+            }
+        }
+        return false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -50,17 +62,17 @@ class SearchActivity : AppCompatActivity() {
                 override fun onQueryTextSubmit(p0: String?): Boolean {
                     return true
                 }
-
                 override fun onQueryTextChange(p0: String?): Boolean {
                     if (p0!!.isEmpty()){
                         return false
                     }
-                    val query = firestoreInstance
-                        .collection("users")
+
+                    val query = db.collection("users")
                         .orderBy("name")
                         .startAt(p0.trim())
-                        .endAt(p0.trim()+ "\uf8ff")
-                    showResultSearch(::updateRecyclerView, query)
+                        .endAt(p0.trim() + "\uf8ff")
+
+                    showResultSearch(::updateRecyclerView , query)
 
                     return true
                 }
@@ -71,37 +83,54 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showResultSearch(onListen: (List<Item>) -> Unit, query: Query) {
+
         val items = mutableListOf<Item>()
         query.get().addOnSuccessListener {
-            it.documents.forEach { document ->
-                items.add(SearchItem(document.toObject(User::class.java)!!, this@SearchActivity))
+
+            it.documents.forEach {document ->
+                items.add(SearchItem(document.toObject(User::class.java)!!, document.id,this@SearchActivity))
             }
             onListen(items)
         }
-
     }
 
-    private fun updateRecyclerView(items: List<Item>) {
+    private fun updateRecyclerView(items: List<Item>){
 
-        fun init() {
+        fun init(){
             recyclerView_search.apply {
-                layoutManager =
-                    LinearLayoutManager(this@SearchActivity)
+                layoutManager = LinearLayoutManager(this@SearchActivity)
+
                 adapter = GroupAdapter<ViewHolder>().apply {
+
                     searchSection = Section(items)
                     add(searchSection)
-                }
 
+                    setOnItemClickListener(onItemClick)
+                }
             }
+
             shouldInitRecyclerView = false
         }
 
-        fun updateItems() = searchSection.update(items)
+        fun updateItem() = searchSection.update(items)
 
-        if (shouldInitRecyclerView)
+        if (shouldInitRecyclerView){
             init()
-        else
-            updateItems()
+        } else {
+            updateItem()
+        }
+    }
+
+    val onItemClick = OnItemClickListener { item, view ->
+
+        if (item is SearchItem){
+
+            val intentChatActivity = Intent(this, ChatActivity::class.java)
+            intentChatActivity.putExtra("user_name",item.user.name)
+            intentChatActivity.putExtra("profile_image",item.user.profileImage)
+            intentChatActivity.putExtra("other_uid",item.otherUserId)
+            this.startActivity(intentChatActivity)
+        }
     }
 
 }
