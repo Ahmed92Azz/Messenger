@@ -121,7 +121,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    val onItemClick = OnItemClickListener { item, view ->
+    private val onItemClick = OnItemClickListener { item, view ->
 
         if (item is SearchItem){
 
